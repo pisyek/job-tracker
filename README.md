@@ -1,58 +1,92 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## How to deploy
 
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Install Composer
 
 ```bash
-composer require laravel/boost --dev
+cd /tmp
 
-php artisan boost:install
+curl -sS https://getcomposer.org/installer -o composer-setup.php
+
+sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bashrc
+
+source ~/.bashrc
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Enable Required Apache Modules
 
-## Contributing
+````bash
+sudo a2enmod rewrite
+sudo a2enmod headers
+sudo systemctl restart apache2
+````
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Configure mod_php
 
-## Code of Conduct
+```bash
+ls /etc/apache2/mods-enabled/ | grep php
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# if any, disable first
+sudo a2dismod php8.3
 
-## Security Vulnerabilities
+# check 8.5 availibility
+ls /etc/apache2/mods-available/ | grep php8.5
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# install if missing
+sudo apt install libapache2-mod-php8.5
 
-## License
+# load php 8.5
+sudo a2enmod php8.5
+sudo systemctl restart apache2
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Create virtual host
+
+```bash
+sudo nano /etc/apache2/sites-available/job-tracker.conf
+```
+
+```apache
+<VirtualHost *:80>
+    ServerName job-tracker.test
+    DocumentRoot /var/www/job-tracker/public
+
+    <Directory /var/www/job-tracker/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/job-tracker-error.log
+    CustomLog ${APACHE_LOG_DIR}/job-tracker-access.log combined
+
+    Header always set X-Frame-Options SAMEORIGIN
+    Header always set X-Content-Type-Options nosniff
+</VirtualHost>
+```
+
+### Set permissions
+
+````bash
+sudo chown -R www-data:www-data /var/www/job-tracker
+
+sudo find /var/www/job-tracker -type d -exec chmod 755 {} \;
+sudo find /var/www/job-tracker -type f -exec chmod 644 {} \;
+
+sudo chmod -R 775 /var/www/job-tracker/storage
+sudo chmod -R 775 /var/www/job-tracker/bootstrap/cache
+````
+
+### Enable virtual host
+
+```bash
+sudo a2ensite job-tracker.conf
+sudo systemctl reload apache2
+```
+
+### Config test
+
+````bash
+sudo apache2ctl configtest
+````
