@@ -5,15 +5,27 @@
 
 ```bash
 cd /tmp
-
 curl -sS https://getcomposer.org/installer -o composer-setup.php
-
 sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-
 echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bashrc
-
 source ~/.bashrc
+
+# check composer version
+composer --version
 ```
+
+### Clone Project to Server
+
+````bash
+git clone https://github.com/<github-username>/job-tracker.git .
+composer install --no-dev --optimize-autoloader
+cp .env.example .env
+nano .env
+
+# generate key
+php artisan key:generate
+php artisan migrate
+````
 
 ### Enable Required Apache Modules
 
