@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('applications.index');
-});
+})->name('home');
 
 Route::resource('applications', JobApplicationController::class);
 Route::resource('companies', CompanyController::class)->only(['index', 'create', 'store', 'show']);
