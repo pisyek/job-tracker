@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use Illuminate\Auth\Middleware\RequirePassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -11,6 +12,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Fortify;
+use Livewire\Livewire;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -30,6 +32,17 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+        $this->configurePersistentMiddleware();
+    }
+
+    /**
+     * Keep Livewire page components behind the password confirmation middleware.
+     */
+    private function configurePersistentMiddleware(): void
+    {
+        Livewire::addPersistentMiddleware([
+            RequirePassword::class,
+        ]);
     }
 
     /**

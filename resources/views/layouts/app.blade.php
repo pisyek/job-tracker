@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 <head>
-    @php($pageTitle = trim($__env->yieldContent('title')))
+    @php($pageTitle = trim($__env->yieldContent('title')) ?: ($title ?? ''))
     @include('partials.head', ['title' => $pageTitle])
 </head>
 <body class="min-h-screen bg-white dark:bg-zinc-800">
@@ -54,6 +54,8 @@
         @endif
 
         @yield('content')
+
+        {{ $slot ?? '' }}
     </flux:main>
 
     @persist('toast')

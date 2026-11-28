@@ -12,3 +12,5 @@ Route::middleware('auth')->group(function () {
     Route::resource('applications', JobApplicationController::class);
     Route::resource('companies', CompanyController::class)->only(['index', 'create', 'store', 'show']);
 });
+
+require __DIR__.'/settings.php';
