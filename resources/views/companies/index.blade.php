@@ -3,30 +3,54 @@
 @section('title', 'Companies')
 
 @section('content')
-    <h2>Companies</h2>
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <flux:heading size="xl">{{ __('Companies') }}</flux:heading>
+            <flux:subheading>{{ __('The employers you are tracking applications against.') }}</flux:subheading>
+        </div>
 
-    <p><a href="{{ route('companies.create') }}">Add a company</a></p>
+        <flux:button variant="primary" :href="route('companies.create')" icon="plus">
+            {{ __('Add a company') }}
+        </flux:button>
+    </div>
 
     @if ($companies->isEmpty())
-        <p>No companies yet.</p>
+        <div class="mt-8">
+            <x-empty-state
+                icon="building-office"
+                :heading="__('No companies yet')"
+                :description="__('Add a company first, then you can attach job applications to it.')"
+            >
+                <x-slot name="action">
+                    <flux:button variant="primary" :href="route('companies.create')" icon="plus">
+                        {{ __('Add a company') }}
+                    </flux:button>
+                </x-slot>
+            </x-empty-state>
+        </div>
     @else
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Location</th>
-                    <th>Applications</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($companies as $company)
-                    <tr>
-                        <td><a href="{{ route('companies.show', $company) }}">{{ $company->name }}</a></td>
-                        <td>{{ $company->location ?? '-' }}</td>
-                        <td>{{ $company->job_applications_count }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <flux:card class="mt-6 overflow-hidden p-0">
+            <flux:table>
+                <flux:table.columns>
+                    <flux:table.column>{{ __('Name') }}</flux:table.column>
+                    <flux:table.column>{{ __('Location') }}</flux:table.column>
+                    <flux:table.column>{{ __('Applications') }}</flux:table.column>
+                </flux:table.columns>
+
+                <flux:table.rows>
+                    @foreach ($companies as $company)
+                        <flux:table.row :key="$company->id">
+                            <flux:table.cell>
+                                <flux:link :href="route('companies.show', $company)" class="font-medium">
+                                    {{ $company->name }}
+                                </flux:link>
+                            </flux:table.cell>
+                            <flux:table.cell>{{ $company->location ?? '—' }}</flux:table.cell>
+                            <flux:table.cell>{{ $company->job_applications_count }}</flux:table.cell>
+                        </flux:table.row>
+                    @endforeach
+                </flux:table.rows>
+            </flux:table>
+        </flux:card>
     @endif
 @endsection

@@ -3,23 +3,41 @@
 @section('title', 'Add a company')
 
 @section('content')
-    <h2>Add a company</h2>
+    <flux:heading size="xl">{{ __('Add a company') }}</flux:heading>
+    <flux:subheading class="mt-1">{{ __('Companies you can attach job applications to.') }}</flux:subheading>
 
-    <form method="POST" action="{{ route('companies.store') }}">
-        @csrf
+    <flux:card class="mt-6 max-w-xl p-6">
+        <form method="POST" action="{{ route('companies.store') }}" class="flex flex-col gap-5">
+            @csrf
 
-        <label for="name">Name</label>
-        <input id="name" name="name" type="text" value="{{ old('name') }}">
-        @error('name') <small>{{ $message }}</small> @enderror
+            <flux:input
+                name="name"
+                :label="__('Name')"
+                :value="old('name')"
+                type="text"
+                :placeholder="__('e.g. Acme Sdn Bhd')"
+            />
 
-        <label for="website">Website</label>
-        <input id="website" name="website" type="url" value="{{ old('website') }}">
-        @error('website') <small>{{ $message }}</small> @enderror
+            <flux:input
+                name="website"
+                :label="__('Website')"
+                :value="old('website')"
+                type="url"
+                placeholder="https://example.com"
+            />
 
-        <label for="location">Location</label>
-        <input id="location" name="location" type="text" value="{{ old('location') }}">
-        @error('location') <small>{{ $message }}</small> @enderror
+            <flux:input
+                name="location"
+                :label="__('Location')"
+                :value="old('location')"
+                type="text"
+                :placeholder="__('e.g. Kuala Lumpur')"
+            />
 
-        <button type="submit">Save</button>
-    </form>
+            <div class="flex items-center justify-end gap-3">
+                <flux:button variant="ghost" :href="route('companies.index')">{{ __('Cancel') }}</flux:button>
+                <flux:button type="submit" variant="primary">{{ __('Save') }}</flux:button>
+            </div>
+        </form>
+    </flux:card>
 @endsection
