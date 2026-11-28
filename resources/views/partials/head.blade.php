@@ -13,3 +13,6 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @fluxAppearance
+{{-- Keep the app dark regardless of system preference (the plan's "dark theme" decision); --}}
+{{-- remove this line if an appearance switcher is ever added. --}}
+<script>window.Flux && window.Flux.applyAppearance('dark')</script>
