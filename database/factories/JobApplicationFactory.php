@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\ApplicationStatus;
 use App\Models\Company;
 use App\Models\JobApplication;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -38,5 +39,26 @@ class JobApplicationFactory extends Factory
                 'They asked for a GitHub link.',
             ]),
         ];
+    }
+
+    /**
+     * Keep the application's owner in step with the company it belongs to.
+     */
+    public function configure(): static
+    {
+        return $this->afterMaking(function (JobApplication $application): void {
+            if ($application->user_id === null && $application->company !== null) {
+                $application->user_id = $application->company->user_id;
+            }
+        });
+    }
+
+    /**
+     * Create an application owned by the given user, on one of that user's companies.
+     */
+    public function forUser(User $user): static
+    {
+        return $this->state(fn (): array => ['user_id' => $user->id])
+            ->for(Company::factory()->for($user));
     }
 }
