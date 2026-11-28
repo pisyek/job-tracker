@@ -54,3 +54,23 @@ it('rejects a password update when the current password is wrong', function () {
 
     expect(password_verify('password', $user->fresh()->password))->toBeTrue();
 });
+
+it('lists the user passkeys and deletes one', function () {
+    $user = User::factory()->create();
+
+    $passkey = $user->passkeys()->create([
+        'name' => 'Test iPhone',
+        'credential_id' => 'test-credential-id',
+        'credential' => ['type' => 'public-key', 'id' => 'test-credential-id'],
+    ]);
+
+    $this->actingAs($user);
+
+    Livewire::test('pages::settings.security')
+        ->assertSee('Test iPhone')
+        ->call('confirmDelete', $passkey->id)
+        ->call('deletePasskey')
+        ->assertSet('showDeleteModal', false);
+
+    expect($user->passkeys()->count())->toBe(0);
+});
