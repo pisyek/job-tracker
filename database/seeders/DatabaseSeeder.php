@@ -16,10 +16,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $demo = User::firstOrCreate(
-            ['email' => env('DEMO_EMAIL', 'demo@example.com')],
+            ['email' => config('demo.email')],
             [
-                'name' => env('DEMO_NAME', 'Demo User'),
-                'password' => env('DEMO_PASSWORD', 'password'),
+                'name' => config('demo.name'),
+                'password' => config('demo.password'),
                 'email_verified_at' => now(),
             ],
         );

@@ -15,7 +15,7 @@ class CompanySeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::where('email', env('DEMO_EMAIL', 'demo@example.com'))->firstOrFail();
+        $user = User::where('email', config('demo.email'))->firstOrFail();
 
         Company::factory()
             ->count(10)

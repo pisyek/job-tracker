@@ -47,8 +47,9 @@ class JobApplicationFactory extends Factory
     public function configure(): static
     {
         return $this->afterMaking(function (JobApplication $application): void {
-            if ($application->user_id === null && $application->company !== null) {
-                $application->user_id = $application->company->user_id;
+            if ($application->getAttribute('user_id') === null &&
+                $application->company instanceof Company) {
+                $application->setAttribute('user_id', $application->company->getAttribute('user_id'));
             }
         });
     }

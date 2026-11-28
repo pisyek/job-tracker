@@ -23,6 +23,8 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 
     /**
      * The companies the user is tracking.
+     *
+     * @return HasMany<Company, $this>
      */
     public function companies(): HasMany
     {
@@ -31,6 +33,8 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 
     /**
      * The job applications the user has recorded.
+     *
+     * @return HasMany<JobApplication, $this>
      */
     public function jobApplications(): HasMany
     {
