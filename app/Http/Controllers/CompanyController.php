@@ -37,6 +37,8 @@ class CompanyController extends Controller
 
     public function show(Company $company): View
     {
+        $company->load('jobApplications');
+
         return view('companies.show', ['company' => $company]);
     }
 }

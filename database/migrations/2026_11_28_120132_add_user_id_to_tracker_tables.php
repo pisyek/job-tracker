@@ -48,8 +48,9 @@ return new class extends Migration
         Schema::table('companies', function (Blueprint $table) {
             $table->dropIndex(['user_id']);
             $table->dropColumn('user_id');
-            $table->unique('name');
         });
+
+        $this->makeCompanyNamesGloballyUnique();
     }
 
     /**
@@ -63,6 +64,35 @@ return new class extends Migration
 
         Schema::table('companies', function (Blueprint $table) {
             $table->unique(['user_id', 'name']);
+        });
+    }
+
+    /**
+     * Rolling back restores a global unique on companies.name, which per-user
+     * duplicates would violate. Suffix the later copies with their row id so
+     * the constraint can be re-added without losing rows.
+     */
+    private function makeCompanyNamesGloballyUnique(): void
+    {
+        $duplicateNames = DB::table('companies')
+            ->select('name')
+            ->groupBy('name')
+            ->havingRaw('count(*) > 1')
+            ->pluck('name');
+
+        foreach ($duplicateNames as $name) {
+            $allIds = DB::table('companies')
+                ->where('name', $name)
+                ->orderBy('id')
+                ->pluck('id');
+
+            foreach ($allIds->skip(1) as $id) {
+                DB::table('companies')->where('id', $id)->update(['name' => $name.' #'.$id]);
+            }
+        }
+
+        Schema::table('companies', function (Blueprint $table) {
+            $table->unique('name');
         });
     }
 

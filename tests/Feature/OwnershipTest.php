@@ -72,6 +72,25 @@ it('rejects another users company id when storing an application', function () {
     expect(JobApplication::where('role_title', 'Sneaky Role')->exists())->toBeFalse();
 });
 
+it('rejects another users company id when updating an application', function () {
+    $alice = User::factory()->create();
+    $bob = User::factory()->create();
+    $alicesApplication = JobApplication::factory()->forUser($alice)->create();
+    $bobsCompany = Company::factory()->for($bob)->create();
+
+    $this->actingAs($alice)
+        ->put(route('applications.update', $alicesApplication), [
+            'company_id' => $bobsCompany->id,
+            'role_title' => $alicesApplication->role_title,
+            'status' => $alicesApplication->status->value,
+        ])
+        ->assertSessionHasErrors('company_id');
+
+    expect($alicesApplication->fresh()->company_id)
+        ->toBe($alicesApplication->company_id)
+        ->not->toBe($bobsCompany->id);
+});
+
 it('allows the same company name for different users', function () {
     $alice = User::factory()->create();
     $bob = User::factory()->create();
@@ -93,6 +112,17 @@ it('rejects a duplicate company name for the same user', function () {
     $this->actingAs($alice)
         ->post(route('companies.store'), ['name' => 'Acme'])
         ->assertSessionHasErrors('name');
+});
+
+it('cascades a user deletion to their companies and applications', function () {
+    $user = User::factory()->create();
+    $company = Company::factory()->for($user)->create();
+    $application = JobApplication::factory()->forUser($user)->for($company)->create();
+
+    $user->delete();
+
+    expect(Company::whereKey($company->id)->exists())->toBeFalse()
+        ->and(JobApplication::whereKey($application->id)->exists())->toBeFalse();
 });
 
 it('never writes an orphan row through the app', function () {
