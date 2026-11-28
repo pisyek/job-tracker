@@ -8,6 +8,17 @@ use Laravel\Fortify\Features;
 abstract class TestCase extends BaseTestCase
 {
     /**
+     * The CI suite runs without built frontend assets, so stub out Vite
+     * instead of requiring public/build/manifest.json during tests.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutVite();
+    }
+
+    /**
      * Skip the running test unless the given Fortify feature is enabled.
      */
     protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
