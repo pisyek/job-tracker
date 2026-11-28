@@ -8,5 +8,7 @@ Route::get('/', function () {
     return redirect()->route('applications.index');
 })->name('home');
 
-Route::resource('applications', JobApplicationController::class);
-Route::resource('companies', CompanyController::class)->only(['index', 'create', 'store', 'show']);
+Route::middleware('auth')->group(function () {
+    Route::resource('applications', JobApplicationController::class);
+    Route::resource('companies', CompanyController::class)->only(['index', 'create', 'store', 'show']);
+});

@@ -9,7 +9,8 @@ uses(RefreshDatabase::class);
 it('shows a job application with its company', function () {
     $application = JobApplication::factory()->create();
 
-    $this->get(route('applications.show', $application))
+    $this->actingAs($application->user)
+        ->get(route('applications.show', $application))
         ->assertOk()
         ->assertSee($application->role_title)
         ->assertSee($application->company->name);

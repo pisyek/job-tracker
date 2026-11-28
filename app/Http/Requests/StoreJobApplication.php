@@ -26,7 +26,10 @@ class StoreJobApplication extends FormRequest
     public function rules(): array
     {
         return [
-            'company_id' => ['required', 'exists:companies,id'],
+            'company_id' => [
+                'required',
+                Rule::exists('companies', 'id')->where('user_id', $this->user()->id),
+            ],
             'role_title' => ['required', 'string', 'max:255'],
             'status' => ['required', Rule::enum(ApplicationStatus::class)],
             'salary_min' => ['nullable', 'integer', 'min:0'],
