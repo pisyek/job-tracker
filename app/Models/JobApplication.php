@@ -14,6 +14,7 @@ class JobApplication extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'company_id',
         'role_title',
         'status',
@@ -34,6 +35,14 @@ class JobApplication extends Model
             'status' => ApplicationStatus::class,
             'applied_on' => 'date',
         ];
+    }
+
+    /**
+     * The user this application belongs to.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function company(): BelongsTo

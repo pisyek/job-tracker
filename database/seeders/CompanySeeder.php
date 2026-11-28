@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\ApplicationStatus;
 use App\Models\Company;
 use App\Models\JobApplication;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class CompanySeeder extends Seeder
@@ -14,8 +15,11 @@ class CompanySeeder extends Seeder
      */
     public function run(): void
     {
+        $user = User::where('email', config('demo.email'))->firstOrFail();
+
         Company::factory()
             ->count(10)
+            ->for($user)
             ->has(
                 JobApplication::factory()
                     ->count(3)

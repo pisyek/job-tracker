@@ -15,15 +15,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $demo = User::firstOrCreate(
+            ['email' => config('demo.email')],
+            [
+                'name' => config('demo.name'),
+                'password' => config('demo.password'),
+                'email_verified_at' => now(),
+            ],
+        );
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
-        $this->call([
-            CompanySeeder::class,
-        ]);
+        if ($demo->companies()->doesntExist()) {
+            $this->call(CompanySeeder::class);
+        }
     }
 }
